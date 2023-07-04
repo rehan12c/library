@@ -50,7 +50,7 @@ export default {
     },
     hapusKategori(id) {
       axios
-          .delete(`https://localhost/library/delete_kategori.php?id=${id}`)
+          .delete(`https://mhdrmaulana.my.id/library/delete_kategori.php?id=${id}`)
           .then(response => {
             console.log(response.data);
             this.getKategoriList();
