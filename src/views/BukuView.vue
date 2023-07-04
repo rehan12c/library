@@ -60,7 +60,7 @@ export default {
   methods: {
     cariBuku(){
       axios
-          .get('http://mhdrmaulana.my.id/library/select_buku.php?q='+this.q)
+          .get('https://mhdrmaulana.my.id/library/select_buku.php?q='+this.q)
           .then(response => {
             this.buku = response.data;
           })
@@ -70,7 +70,7 @@ export default {
     },
     getBukuList() {
       axios
-          .get('http://mhdrmaulana.my.id/library/select_buku.php')
+          .get('https://mhdrmaulana.my.id/library/select_buku.php')
           .then(response => {
             this.buku = response.data;
           })
@@ -80,7 +80,7 @@ export default {
     },
     hapusBuku(id) {
       axios
-          .delete(`http://mhdrmaulana.my.id/library/delete_buku.php?id=${id}`)
+          .delete(`https://mhdrmaulana.my.id/library/delete_buku.php?id=${id}`)
           .then(response => {
             console.log(response.data);
             this.getBukuList();

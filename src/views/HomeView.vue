@@ -30,7 +30,7 @@ export default {
   methods: {
     getBukuList() {
       axios
-          .get('http://mhdrmaulana.my.id/library/select_buku.php')
+          .get('https://mhdrmaulana.my.id/library/select_buku.php')
           .then(response => {
             this.buku = response.data;
           })
