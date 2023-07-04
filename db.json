@@ -1,0 +1,5 @@
+{
+  "buku": [
+    {"id": 1, "judul": "judul", "content": "ini content"},
+  ]
+}
