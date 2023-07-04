@@ -4,7 +4,7 @@
     $conn = getConnection();
 
     try {
-        $statement = $conn->query("SELECT * FROM kategori");
+        $statement = $conn->query("SELECT * FROM anggota");
 
         $statement->setFetchMode(PDO::FETCH_ASSOC);
 
@@ -14,3 +14,5 @@
     } catch (PDOException $e) {
         echo $e;
     }
+
+    

@@ -1,48 +1,52 @@
 <?php
-include 'koneksi.php';
+include 'connection.php';
+$conn = getConnection();
 
-// Memeriksa apakah data telah dikirim melalui metode POST
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Memeriksa apakah elemen-elemen yang dibutuhkan tersedia dalam array $_POST
-    if (isset($_POST['kode'], $_POST['kode_kategori'], $_POST['judul'], $_POST['pengarang'], $_POST['penerbit'], $_POST['tahun'], $_POST['tanggal_input'], $_POST['harga'], $_POST['file_cover'])) {
-        // Mendapatkan data dari request
-        $kode = $_POST['kode'];
-        $kode_kategori = $_POST['kode_kategori'];
-        $judul = $_POST['judul'];
-        $pengarang = $_POST['pengarang'];
-        $penerbit = $_POST['penerbit'];
-        $tahun = $_POST['tahun'];
-        $tanggal_input = $_POST['tanggal_input'];
-        $harga = $_POST['harga'];
-        $file_cover = $_POST['file_cover'];
+$kode = isset($_POST['kode']) ? $_POST['kode'] : '';
+$kode_kategori = isset($_POST['kode_kategori']) ? $_POST['kode_kategori'] : '';
+$judul = isset($_POST['judul']) ? $_POST['judul'] : '';
+$pengarang = isset($_POST['pengarang']) ? $_POST['pengarang'] : '';
+$penerbit = isset($_POST['penerbit']) ? $_POST['penerbit'] : '';
+$tahun = isset($_POST['tahun']) ? $_POST['tahun'] : '';
+$tanggal_input = isset($_POST['tanggal_input']) ? $_POST['tanggal_input'] : '';
+$harga = isset($_POST['harga']) ? $_POST['harga'] : '';
+$file_cover = isset($_POST['file_cover']) ? $_POST['file_cover'] : '';
 
-        // Query SQL untuk memasukkan data buku ke database
-        $sql = "INSERT INTO buku (kode, kode_kategori, judul, pengarang, penerbit, tahun, tanggal_input, harga, file_cover)
-                VALUES ('$kode', '$kode_kategori', '$judul', '$pengarang', '$penerbit', '$tahun', '$tanggal_input', '$harga', '$file_cover')";
+try {
+    $conn = getConnection();
 
-        if ($koneksi->query($sql) === TRUE) {
-            $response = [
-                'status' => 'success',
-                'message' => 'Data buku berhasil ditambahkan.'
-            ];
-        } else {
-            $response = [
-                'status' => 'error',
-                'message' => 'Terjadi kesalahan: ' . $koneksi->error
-            ];
-        }
-    } else {
-        $response = [
-            'status' => 'error',
-            'message' => 'Data yang diperlukan tidak lengkap.'
-        ];
-    }
-} else {
+    $query = "INSERT INTO buku (kode, kode_kategori, judul, pengarang, penerbit, tahun, tanggal_input, harga, file_cover) 
+              VALUES (:kode, :kode_kategori, :judul, :pengarang, :penerbit, :tahun, :tanggal_input, :harga, :file_cover)";
+    
+    $statement = $conn->prepare($query);
+    
+    $statement->bindParam(':kode', $kode);
+    $statement->bindParam(':kode_kategori', $kode_kategori);
+    $statement->bindParam(':judul', $judul);
+    $statement->bindParam(':pengarang', $pengarang);
+    $statement->bindParam(':penerbit', $penerbit);
+    $statement->bindParam(':tahun', $tahun);
+    $statement->bindParam(':tanggal_input', $tanggal_input);
+    $statement->bindParam(':harga', $harga);
+    $statement->bindParam(':file_cover', $file_cover);
+    
+    $statement->execute();
+    
+    $response = [
+        'status' => 'success',
+        'message' => 'Data buku berhasil ditambahkan'
+    ];
+} catch(PDOException $e) {
+    
     $response = [
         'status' => 'error',
-        'message' => 'Metode request yang tidak valid.'
+        'message' => 'Terjadi kesalahan saat menambahkan data buku: ' . $e->getMessage()
     ];
 }
 
+
 echo json_encode($response);
+
+
+$conn = null;
 ?>

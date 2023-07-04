@@ -1,25 +1,18 @@
 <?php
-include 'koneksi.php';
+    include 'connection.php';
 
-// Query SQL untuk mengambil semua data buku
-$sql = "SELECT * FROM buku";
-$result = $koneksi->query($sql);
+    $conn = getConnection();
 
-$books = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $books[] = $row;
+    try {
+        $statement = $conn->query("SELECT * FROM buku");
+
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+
+        $result = $statement->fetchAll();
+
+        echo json_encode ($result, JSON_PRETTY_PRINT);
+    } catch (PDOException $e) {
+        echo $e;
     }
-    $response = [
-        'status' => 'success',
-        'data' => $books
-    ];
-} else {
-    $response = [
-        'status' => 'success',
-        'data' => []
-    ];
-}
 
-echo json_encode($response);
-?>
+    

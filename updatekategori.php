@@ -1,51 +1,46 @@
 <?php
 // Include file koneksi.php untuk mendapatkan koneksi ke database
-include 'koneksi.php';
+include 'connection.php';
 
-$connection = getConnection();
+$conn = getConnection();
 
-// Mendapatkan data yang dikirim melalui metode GET
-$kode = isset($_GET['kode']) ? $_GET['kode'] : '';
+// Mendapatkan data yang dikirim melalui metode POST
+$id = isset($_POST['id']) ? $_POST['id'] : '';
+$kode = isset($_POST['kode']) ? $_POST['kode'] : '';
+$kategori = isset($_POST['kategori']) ? $_POST['kategori'] : '';
 
 try {
-    // Query SQL untuk memilih data buku berdasarkan kode
-    $query = "SELECT * FROM kategori WHERE kode = :kode";
-
+    // Query SQL untuk memperbarui data kategori berdasarkan kode
+    $query = "UPDATE kategori SET kode = :kode, kategori = :kategori WHERE id = :id";
+    
     // Mempersiapkan statement PDO untuk eksekusi query
-    $statement = $connection->prepare($query);
-
+    $statement = $conn->prepare($query);
+    
     // Mengikat parameter dengan nilai yang sesuai
+    $statement->bindParam(':id', $id);
     $statement->bindParam(':kode', $kode);
-
+    $statement->bindParam(':kategori', $kategori);
+    
     // Eksekusi statement
     $statement->execute();
-
-    // Mendapatkan hasil seleksi
-    $kategori = $statement->fetch(PDO::FETCH_ASSOC);
-
-    // Mengirimkan response dengan data buku
-    if ($kategori) {
-        $response = [
-            'status' => 'success',
-            'data' => $kategori
-        ];
-    } else {
-        $response = [
-            'status' => 'error',
-            'message' => 'Data kategori tidak ditemukan'
-        ];
-    }
-} catch (PDOException $e) {
+    
+    // Mengirimkan response dalam format JSON
+    $response = [
+        'status' => 'success',
+        'message' => 'Data kategori berhasil diperbarui'
+    ];
+} catch(PDOException $e) {
     // Jika terjadi error, tampilkan pesan error
     $response = [
         'status' => 'error',
-        'message' => 'Terjadi kesalahan saat memilih data kategori: ' . $e->getMessage()
+        'message' => 'Terjadi kesalahan saat memperbarui data kategori: ' . $e->getMessage()
     ];
 }
 
-// Mengirimkan response JSON
+// Mengirimkan response dalam format JSON
+header('Content-Type: application/json');
 echo json_encode($response);
 
 // Menutup koneksi
-$connection = null;
+$conn = null;
 ?>

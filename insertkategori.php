@@ -1,41 +1,53 @@
 <?php
-include 'koneksi.php';
+// Include file koneksi.php untuk mendapatkan koneksi ke database
+include 'connection.php';
 
-// Memeriksa apakah data telah dikirim melalui metode POST
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Memeriksa apakah elemen-elemen yang dibutuhkan tersedia dalam array $_POST
-    if (isset($_POST['kode'], $_POST['katagori'])) {
-        // Mendapatkan data dari request
-        $kode = $_POST['kode'];
-        $kategori = $_POST['kategori'];
+// Mendapatkan data yang dikirim melalui metode POST
+$kode = isset($_POST['kode']) ? $_POST['kode'] : '';
+$kategori = isset($_POST['kategori']) ? $_POST['kategori'] : '';
 
-        // Query SQL untuk memasukkan data buku ke database
-        $sql = "INSERT INTO katagori (kode, kategori) 
-                VALUES ('$kode', '$kode_kategori')";
+    // Establish database connection
+    $conn = getConnection();
 
-        if ($koneksi->query($sql) === TRUE) {
-            $response = [
-                'status' => 'success',
-                'message' => 'Data buku berhasil ditambahkan.'
-            ];
-        } else {
-            $response = [
-                'status' => 'error',
-                'message' => 'Terjadi kesalahan: ' . $koneksi->error
-            ];
-        }
+try {
+    // Mengecek apakah data POST telah diterima
+    if (!empty($kode) && !empty($kategori)) {
+        // Query SQL untuk melakukan insert data kategori
+        $query = "INSERT INTO kategori (kode, kategori) VALUES (:kode, :kategori)";
+        
+        // Mempersiapkan statement PDO untuk eksekusi query
+        $statement = $conn->prepare($query);
+        
+        // Mengikat parameter dengan nilai yang sesuai
+        $statement->bindParam(':kode', $kode);
+        $statement->bindParam(':kategori', $kategori);
+        
+        // Eksekusi statement
+        $statement->execute();
+        
+        // Mengembalikan response sukses
+        $response = [
+            'status' => 'success',
+            'message' => 'Data kategori berhasil ditambahkan'
+        ];
     } else {
+        // Mengembalikan response jika data POST tidak lengkap
         $response = [
             'status' => 'error',
-            'message' => 'Data yang diperlukan tidak lengkap.'
+            'message' => 'Data kategori tidak lengkap'
         ];
     }
-} else {
+} catch(PDOException $e) {
+    // Jika terjadi error, tampilkan pesan error
     $response = [
         'status' => 'error',
-        'message' => 'Metode request yang tidak valid.'
+        'message' => 'Terjadi kesalahan saat menambahkan data kategori: ' . $e->getMessage()
     ];
 }
 
+// Mengirimkan response JSON
 echo json_encode($response);
+
+// Menutup koneksi
+$conn = null;
 ?>
